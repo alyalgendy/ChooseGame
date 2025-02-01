@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Choose Your Fate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Basic reset */
         * {
@@ -13,7 +14,7 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background: url('https://github.com/alyalgendy/ChooseGame/blob/main/Forest.jpg') no-repeat center center fixed;
             background-size: cover;
             color: #fff;
@@ -24,39 +25,51 @@
         }
 
         #game-container {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.8);
             padding: 2rem;
-            border-radius: 8px;
+            border-radius: 10px;
             width: 90%;
             max-width: 600px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         h1 {
             margin-bottom: 1rem;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            font-weight: 700;
         }
 
         #story-text {
             margin-bottom: 1.5rem;
             font-size: 1.2rem;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .choice-btn {
             background-color: #4CAF50;
             border: none;
-            padding: 0.8rem 1.2rem;
+            padding: 0.8rem 1.5rem;
             margin: 0.5rem;
-            border-radius: 4px;
+            border-radius: 5px;
             font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.3s;
         }
 
         .choice-btn:hover {
             background-color: #388E3C;
+            transform: scale(1.05);
+        }
+
+        .choice-btn:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
