@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Choose Your Fate</title>
+    <style>
+        /* Basic reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: url('Forest.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #game-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        #story-text {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .choice-btn {
+            background-color: #4CAF50;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            margin: 0.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .choice-btn:hover {
+            background-color: #388E3C;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Choose Your Fate</h1>
+        <p id="story-text"></p>
+        <div id="choices"></div>
+    </div>
+
+    <script>
+        // Story structure: each key represents a scene/node in the adventure.
+        const story = {
+            start: {
+                text: "You awaken in a mysterious forest with no memory of how you got here. The sounds of unknown creatures echo in the distance. What will you do?",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Climb a tree to get a better view", next: "climb" },
+                    { text: "Follow a mysterious path", next: "path" }
+                ]
+            },
+            explore: {
+                text: "You venture deeper into the forest and find a small, hidden village. The villagers seem wary. Do you approach them?",
+                choices: [
+                    { text: "Greet the villagers", next: "greet" },
+                    { text: "Hide and observe", next: "observe" },
+                    { text: "Explore a nearby cave", next: "explore_cave" }
+                ]
+            },
+            climb: {
+                text: "You climb a tall oak tree and see smoke rising in the distance. It could be a sign of civilization—or danger. What do you do?",
+                choices: [
+                    { text: "Head toward the smoke", next: "smoke" },
+                    { text: "Return to the forest floor", next: "explore" },
+                    { text: "Look for a river", next: "find_river" }
+                ]
+            },
+            path: {
+                text: "You follow the mysterious path and find an ancient ruin. It looks abandoned, but you feel a strange presence. What do you do?",
+                choices: [
+                    { text: "Enter the ruin", next: "enter_ruin" },
+                    { text: "Turn back", next: "start" }
+                ]
+            },
+            enter_ruin: {
+                text: "Inside the ruin, you find ancient artifacts and a hidden passage. Do you explore further?",
+                choices: [
+                    { text: "Explore the passage", next: "explore_passage" },
+                    { text: "Take an artifact and leave", next: "take_artifact" }
+                ]
+            },
+            explore_passage: {
+                text: "You explore the passage and find a hidden chamber filled with treasures. You also find a map leading to more adventures.",
+                choices: [
+                    { text: "Take the map and leave", next: "take_map" },
+                    { text: "Stay and explore the chamber", next: "explore_chamber" }
+                ]
+            },
+            take_artifact: {
+                text: "You take an artifact and leave the ruin. Suddenly, you feel a strange power coursing through you.",
+                choices: [
+                    { text: "Use the power", next: "use_power" },
+                    { text: "Hide the artifact", next: "hide_artifact" }
+                ]
+            },
+            take_map: {
+                text: "You take the map and leave the ruin. The map shows a path to a hidden treasure in the forest.",
+                choices: [
+                    { text: "Follow the map", next: "follow_map" },
+                    { text: "Hide the map and explore the forest", next: "explore" }
+                ]
+            },
+            explore_chamber: {
+                text: "You explore the chamber and find a hidden door. Behind the door, you discover a magical portal.",
+                choices: [
+                    { text: "Enter the portal", next: "enter_portal" },
+                    { text: "Leave the chamber", next: "leave_chamber" }
+                ]
+            },
+            enter_portal: {
+                text: "You enter the portal and find yourself in a magical realm filled with wonders and dangers.",
+                choices: [
+                    { text: "Explore the realm", next: "explore_realm" },
+                    { text: "Return through the portal", next: "return_portal" }
+                ]
+            },
+            leave_chamber: {
+                text: "You leave the chamber and return to the forest. The adventure continues.",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Return to the village", next: "explore_village" }
+                ]
+            },
+            follow_map: {
+                text: "You follow the map and find a hidden treasure in the forest. The treasure grants you immense wealth and power.",
+                choices: [
+                    { text: "Use the treasure", next: "use_treasure" },
+                    { text: "Hide the treasure", next: "hide_treasure" }
+                ]
+            },
+            use_treasure: {
+                text: "You use the treasure to build a new life. You become a powerful and respected figure in the land.",
+                choices: []
+            },
+            hide_treasure: {
+                text: "You hide the treasure and decide to keep its power a secret.",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Return to the village", next: "explore_village" }
+                ]
+            },
+            explore_realm: {
+                text: "You explore the magical realm and find many wonders and dangers. Your adventure continues in this new world.",
+                choices: [
+                    { text: "Find allies", next: "find_allies" },
+                    { text: "Seek out dangers", next: "seek_dangers" }
+                ]
+            },
+            return_portal: {
+                text: "You return through the portal and find yourself back in the forest. The adventure continues.",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Return to the village", next: "explore_village" }
+                ]
+            },
+            find_allies: {
+                text: "You find allies in the magical realm and form a powerful team. Together, you face many challenges and adventures.",
+                choices: []
+            },
+            seek_dangers: {
+                text: "You seek out dangers in the magical realm and face many challenges. Your bravery earns you great respect.",
+                choices: []
+            },
+            // Existing fates...
+            greet: {
+                text: "The villagers welcome you warmly and offer food and shelter. You have found allies in this strange land. Your adventure continues with newfound friends.",
+                choices: [
+                    { text: "Help the villagers", next: "help_villagers" },
+                    { text: "Explore the village", next: "explore_village" }
+                ]
+            },
+            observe: {
+                text: "While hiding, you accidentally make noise. The villagers notice you and, feeling threatened, chase you away. You find yourself alone once more.",
+                choices: [
+                    { text: "Try exploring elsewhere", next: "explore" },
+                    { text: "Climb a tree to get away", next: "climb" }
+                ]
+            },
+            smoke: {
+                text: "Following the smoke, you arrive at a bustling town. It seems there’s much to discover here. Perhaps this is the start of a new chapter in your life.",
+                choices: [
+                    { text: "Explore the town", next: "explore_town" },
+                    { text: "Find a place to stay", next: "find_stay" }
+                ]
+            },
+            help_villagers: {
+                text: "You help the villagers with their daily tasks and earn their trust. They share their knowledge of the forest with you.",
+                choices: [
+                    { text: "Learn about the forest", next: "learn_forest" },
+                    { text: "Ask about the smoke", next: "ask_smoke" }
+                ]
+            },
+            explore_village: {
+                text: "You explore the village and find it to be a peaceful place. The villagers are friendly and helpful.",
+                choices: [
+                    { text: "Help the villagers", next: "help_villagers" },
+                    { text: "Rest for a while", next: "rest_village" }
+                ]
+            },
+            explore_town: {
+                text: "You explore the town and find it to be a bustling place with many opportunities.",
+                choices: [
+                    { text: "Find a job", next: "find_job" },
+                    { text: "Look for adventure", next: "look_adventure" }
+                ]
+            },
+            find_stay: {
+                text: "You find a place to stay and rest for a while. The town seems to be a safe place.",
+                choices: [
+                    { text: "Explore the town", next: "explore_town" },
+                    { text: "Look for work", next: "find_job" }
+                ]
+            },
+            learn_forest: {
+                text: "The villagers teach you about the forest and its secrets. You feel more confident in your surroundings.",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Stay with the villagers", next: "stay_villagers" }
+                ]
+            },
+            ask_smoke: {
+                text: "The villagers tell you that the smoke is from a nearby town. They warn you to be cautious if you decide to go there.",
+                choices: [
+                    { text: "Head toward the smoke", next: "smoke" },
+                    { text: "Stay with the villagers", next: "stay_villagers" }
+                ]
+            },
+            rest_village: {
+                text: "You rest in the village and regain your strength. The villagers are kind and offer you food and shelter.",
+                choices: [
+                    { text: "Help the villagers", next: "help_villagers" },
+                    { text: "Explore the forest", next: "explore" }
+                ]
+            },
+            find_job: {
+                text: "You find a job in the town and start a new life. The town offers many opportunities for growth and adventure.",
+                choices: [
+                    { text: "Look for adventure", next: "look_adventure" },
+                    { text: "Settle down", next: "settle_down" }
+                ]
+            },
+            look_adventure: {
+                text: "You look for adventure in the town and find many exciting opportunities. Your journey is just beginning.",
+                choices: [
+                    { text: "Explore the town", next: "explore_town" },
+                    { text: "Find a place to stay", next: "find_stay" }
+                ]
+            },
+            stay_villagers: {
+                text: "You decide to stay with the villagers and help them with their daily tasks. You find peace and happiness in the village.",
+                choices: []
+            },
+            settle_down: {
+                text: "You decide to settle down in the town and start a new life. The town offers many opportunities for growth and adventure.",
+                choices: []
+            },
+            explore_cave: {
+                text: "You find a hidden cave in the forest. It looks dark and mysterious. Do you enter?",
+                choices: [
+                    { text: "Enter the cave", next: "enter_cave" },
+                    { text: "Stay outside", next: "stay_outside" }
+                ]
+            },
+            enter_cave: {
+                text: "Inside the cave, you find ancient drawings on the walls and a hidden treasure chest. What do you do?",
+                choices: [
+                    { text: "Open the chest", next: "open_chest" },
+                    { text: "Leave the cave", next: "leave_cave" }
+                ]
+            },
+            stay_outside: {
+                text: "You decide to stay outside the cave. Suddenly, you hear a noise behind you. It's a wild animal!",
+                choices: [
+                    { text: "Run away", next: "run_away" },
+                    { text: "Climb a tree", next: "climb" }
+                ]
+            },
+            open_chest: {
+                text: "You open the chest and find a magical artifact. It grants you the power to control the forest.",
+                choices: [
+                    { text: "Use the power", next: "use_power" },
+                    { text: "Hide the artifact", next: "hide_artifact" }
+                ]
+            },
+            leave_cave: {
+                text: "You leave the cave and continue your journey through the forest.",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Return to the village", next: "explore_village" }
+                ]
+            },
+            run_away: {
+                text: "You run away from the wild animal and find yourself at the edge of the forest.",
+                choices: [
+                    { text: "Enter the town", next: "explore_town" },
+                    { text: "Return to the forest", next: "explore" }
+                ]
+            },
+            use_power: {
+                text: "You use the power of the artifact to control the forest. You become the guardian of the forest.",
+                choices: []
+            },
+            hide_artifact: {
+                text: "You hide the artifact and decide to keep its power a secret.",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Return to the village", next: "explore_village" }
+                ]
+            },
+            find_river: {
+                text: "You find a river flowing through the forest. The water looks clear and refreshing. What do you do?",
+                choices: [
+                    { text: "Drink the water", next: "drink_water" },
+                    { text: "Follow the river", next: "follow_river" }
+                ]
+            },
+            drink_water: {
+                text: "You drink the water and feel rejuvenated. You gain the strength to continue your journey.",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Follow the river", next: "follow_river" }
+                ]
+            },
+            follow_river: {
+                text: "You follow the river and find a waterfall. Behind the waterfall, you discover a hidden cave.",
+                choices: [
+                    { text: "Enter the cave", next: "enter_cave" },
+                    { text: "Rest by the waterfall", next: "rest_waterfall" }
+                ]
+            },
+            rest_waterfall: {
+                text: "You rest by the waterfall and enjoy the peaceful surroundings. You feel at peace.",
+                choices: [
+                    { text: "Explore the forest", next: "explore" },
+                    { text: "Follow the river", next: "follow_river" }
+                ]
+            }
+        };
+
+        // Current state of the game.
+        let currentScene = "start";
+
+        // References to DOM elements.
+        const storyTextElement = document.getElementById("story-text");
+        const choicesElement = document.getElementById("choices");
+
+        // Function to display a scene.
+        function displayScene(sceneKey) {
+            const scene = story[sceneKey];
+            currentScene = sceneKey;
+            storyTextElement.textContent = scene.text;
+            
+            // Clear previous choices
+            choicesElement.innerHTML = "";
+
+            // Create buttons for each choice, if any.
+            if (scene.choices.length === 0) {
+                // End of game, offer restart.
+                const restartBtn = document.createElement("button");
+                restartBtn.textContent = "Restart Game";
+                restartBtn.classList.add("choice-btn");
+                restartBtn.addEventListener("click", () => {
+                    displayScene("start");
+                });
+                choicesElement.appendChild(restartBtn);
+            } else {
+                scene.choices.forEach(choice => {
+                    const button = document.createElement("button");
+                    button.textContent = choice.text;
+                    button.classList.add("choice-btn");
+                    button.addEventListener("click", () => {
+                        displayScene(choice.next);
+                    });
+                    choicesElement.appendChild(button);
+                });
+            }
+        }
+
+        // Start the game.
+        displayScene(currentScene);
+    </script>
+</body>
+</html>
